@@ -9,10 +9,21 @@ app.config["MONGO_URI"] = "mongodb://user:password@ds039717.mongolab.com:39717/h
 
 mongo = PyMongo(app)
 
-@app.route('/', methods=['get', 'post'])
-def hello():
-    return Response("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Sms>Mirror: " + request.form['Body'] + "</Sms></Response>",
-        mimetype="text/xml")
+@app.route('/')
+def main():
+    return "Votes for A: " + str(mongo.db.votes.find({"to": "A"}).count()) + \
+           " Votes for B: " + str(mongo.db.votes.find({"to": "B"}).count())
+
+@app.route('/vote', methods=['post'])
+def vote():
+    msg = request.form["Body"]
+
+    mongo.db.votes.insert({
+        "to": request.form["Body"],
+        "from": request.form["From"]
+    });
+
+    return Response("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n", mimetype="text/xml")
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, Response
+from flask import Flask, Response, request
 from flask.ext.pymongo import PyMongo
 
 # phone number is (424) 231-5779
@@ -11,7 +11,7 @@ mongo = PyMongo(app)
 
 @app.route('/', methods=['get', 'post'])
 def hello():
-    return Response("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Sms>Hello, Mobile Monkey</Sms></Response>",
+    return Response("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Sms>Mirror: " + request.form['Body'] + "</Sms></Response>",
         mimetype="text/xml")
 
 if __name__ == '__main__':

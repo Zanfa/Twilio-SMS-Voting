@@ -1,5 +1,5 @@
 import os
-from flask import Flask, Response, request
+from flask import Flask, Response, request, json, render_template
 from flask.ext.pymongo import PyMongo
 
 # phone number is (424) 231-5779
@@ -9,12 +9,20 @@ app.config["MONGO_URI"] = "mongodb://user:password@ds039717.mongolab.com:39717/h
 
 mongo = PyMongo(app)
 
-@app.route('/')
+@app.route("/")
 def main():
-    return "Votes for A: " + str(mongo.db.votes.find({"to": "A"}).count()) + \
-           " Votes for B: " + str(mongo.db.votes.find({"to": "B"}).count())
+    return render_template("main.html")
 
-@app.route('/vote', methods=['post'])
+@app.route("/json")
+def votesAsJSON():
+    data = {
+        "A": mongo.db.votes.find({"to": "A"}).count(),
+        "B": mongo.db.votes.find({"to": "B"}).count()
+    }
+
+    return Response(json.dumps(data), mimetype="application/json")
+
+@app.route("/vote", methods=["post"])
 def vote():
     msg = request.form["Body"]
 
